@@ -1,10 +1,17 @@
-from fastapi import FastAPI
+import validators
+from fastapi import FastAPI, HTTPException
+
+from . import schemas
+
+def raise_bad_request(message):
+    raise HTTPException(status_code=400, detail=message)
 
 # The app variable is the main point of interaction to create the API
 app = FastAPI()
 
-# Associate root path with read_root() by registering it in FastAPI. FastAPI listens to the root path and delegates all incoming GET requests to your read_root() function.
-@app.get("/")
-def read_root():
-    # This string is displayed when you send a request to the root path of your API.
-    return "Hello World!! This is an API!!!"
+# define the create_url endpoint, which expects a URL string as a POST request body
+@app.post("/url")
+def create_url(url: schemas.URLBase):
+    if not validators.url(url.target_url):
+        raise_bad_request(message="The provided URL is not valid.")
+    return f"TODO: Create database entry for: {url.target_url}"
